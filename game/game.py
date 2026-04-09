@@ -201,15 +201,18 @@ class Game:
 
         # Flop
         self.deal_flop()
+        self.next_betting_round()
 
         # Turn
         self.deal_turn()
+        self.next_betting_round()
 
         # River
         self.deal_river()
+        self.next_betting_round()
 
-        print("\n--- END OF ROUND ---")
-        print("Winner ideation to be implemented....")
+
+        print("\n--- END OF ROUNDS ---")
 
 
 if __name__ == "__main__":

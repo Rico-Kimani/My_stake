@@ -213,8 +213,45 @@ class Game:
         self.deal_river()
         self.next_betting_round()
 
+        self.determine_winner()
+
 
         print("\n--- END OF ROUNDS ---")
+
+
+    def get_highest_card(self, cards):
+        """Return the index of the highest card value from a list of cards."""
+        values = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"]
+        
+        max_value = -1
+        
+        for card in cards:
+            val = values.index(card.rank)
+            if val > max_value:
+                max_value = val
+                
+        return max_value
+    
+    def determine_winner(self):
+        """Determine the winner by comparing player hands and award the pot to the winner."""
+        print("\n--- SHOWDOWN ---")
+
+        self.show_player_cards()
+        self.show_pc_cards()
+
+        human_score = self.get_highest_card(self.human.cards + self.community_cards)
+        pc_score = self.get_highest_card(self.pc.cards + self.community_cards)
+
+        if human_score > pc_score:
+            print("You win!")
+            self.human.amount += self.main_pot
+
+        elif pc_score > human_score:
+            print("PC wins!")
+            self.pc.amount += self.main_pot
+
+        else:
+            print("Draw!")
 
 
 if __name__ == "__main__":

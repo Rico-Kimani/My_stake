@@ -161,6 +161,8 @@ class Game:
         print("\n--- FLOP ---")
         self.stage = "flop"
 
+        self.deck .burn_card()  # burn a card before the flop
+
         for _ in range(3):
             self.community_cards.append(self.deck.give_card())
 

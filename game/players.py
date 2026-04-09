@@ -56,6 +56,26 @@ class Player:
         self.amount -= raise_amount
         print(f"PC raises to {raise_amount}")
         return raise_amount
+    
+    def get_action(self, current_bet, can_check=False):
+        if self.type == "human":
+            while True:
+                if can_check:
+                    action = input("Choose action [check / raise]: ").lower()
+                    if action in ["check", "raise"]:
+                        return action
+                else:
+                    action = input("Choose action [call / fold / raise]: ").lower()
+                    if action in ["call", "fold", "raise"]:
+                        return action
+                
+                print("Invalid action. Try again.")
+                
+        else:
+            import random
+            if can_check:
+                return random.choice(["check", "raise"])
+            return random.choice(["call", "fold", "raise"])
 
     def update_amount_bet(self, amount):
         """Updates the total amount bet by adding the given amount."""
@@ -76,3 +96,8 @@ if __name__ == "__main__":
 
     pc_action = pc.auto_match_or_raise(bet)
     print("PC action:", pc_action)
+
+if __name__ == "__main__":
+    p = Player(type="human", amount=1000)
+    action = p.get_action(100)
+    print("Action:", action)

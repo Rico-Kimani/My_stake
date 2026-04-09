@@ -7,6 +7,8 @@ class Game:
 
     def __init__(self):
         self.pots = {"main": 0, "current": 0}
+        self.main_pot = 0
+        self.current_pot = 0
         self.stage = "pre-flop"   # track current stage o a game
 
         # Initialize deck
@@ -69,22 +71,87 @@ class Game:
         """Execute the first betting round where human and PC place initial bets."""
         print("\n--- FIRST BETTING ROUND ---")
 
-        human_bet = self.human.place_initial_bet()
-        self.human.update_amount_bet(human_bet)
+        current_bet = 0
 
-        pc_bet = self.pc.auto_match_or_raise(human_bet)
+    # Human turn
+        action = self.human.get_action(current_bet)
+        if action == "fold":
+            print("You folded. PC wins.")
+            return False
 
-        if pc_bet == "fold":
+        elif action == "call":
+            bet = current_bet
+
+        elif action == "raise":
+            bet = int(input("Enter raise amount: "))
+            current_bet = bet
+
+        self.human.amount -= bet
+        self.human.update_amount_bet(bet)
+
+    # PC turn
+        pc_action = self.pc.get_action(current_bet)
+
+        if pc_action == "fold":
             print("PC folded. You win!")
             return False
 
+        elif pc_action == "call":
+            pc_bet = current_bet
+
+        elif pc_action == "raise":
+            pc_bet = current_bet + 50
+            current_bet = pc_bet
+            print(f"PC raises to {pc_bet}")
+
+        self.pc.amount -= pc_bet
         self.pc.update_amount_bet(pc_bet)
 
-        self.pots["current"] = human_bet + pc_bet
-        self.pots["main"] += self.pots["current"]
+    # Update pot
+        self.current_pot = bet + pc_bet
+        self.main_pot += self.current_pot
 
-        print(f"Current pot: {self.pots['main']}")
-        return True
+        print(f"Pot is now: {self.main_pot}")
+        return True 
+    
+
+    def next_betting_round(self):
+        """Execute a betting round after the flop, turn, or river."""
+        print(f"\n--- {self.stage.upper()} BETTING ROUND ---")
+
+        current_bet = 0
+
+    # Human
+        action = self.human.get_action(current_bet, can_check=True)
+
+        if action == "check":
+            human_bet = 0
+
+        elif action == "raise":
+            human_bet = int(input("Enter raise amount: "))
+            current_bet = human_bet
+
+        self.human.amount -= human_bet
+        self.human.update_amount_bet(human_bet)
+
+    # PC
+        pc_action = self.pc.get_action(current_bet, can_check=True)
+
+        if pc_action == "check":
+            pc_bet = 0
+
+        elif pc_action == "raise":
+            pc_bet = current_bet + 50
+            print(f"PC raises to {pc_bet}")
+
+        self.pc.amount -= pc_bet
+        self.pc.update_amount_bet(pc_bet)
+
+    # Update pot
+        self.current_pot = human_bet + pc_bet
+        self.main_pot += self.current_pot
+        
+        print(f"Pot is now: {self.main_pot}")
 
     # -------------------------
     # COMMUNITY CARDS
